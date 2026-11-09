@@ -1,6 +1,6 @@
 import { describe, it, test, expect, beforeEach, jest } from '@jest/globals'
 import { createRound, createInitialDeck} from '../utils/test_adapter'
-import { canPlayAny, draw, Round, play, topOfDiscard } from '../../src/model/round'
+import { canPlayAny, draw, RoundState, play, topOfDiscard } from '../../src/model/round'
 import { deterministicShuffle as deterministicShuffler, noShuffle, shuffleBuilder, successiveShufflers } from '../utils/shuffling'
 import { is } from '../utils/predicates'
 import { standardShuffler } from '../../src/utils/random_utils'
@@ -13,7 +13,7 @@ describe("Playing a card", () => {
       .hand(0)
         .is({type: 'NUMBERED', color: 'RED', number: 3})
       .build()
-    const round: Round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
+    const round: RoundState = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
     expect(() => play(0, undefined, round)).toThrow()
   })
 
@@ -48,7 +48,7 @@ describe("Playing a card", () => {
         .hand(0)
           .is({ type: 'NUMBERED', color: 'RED', number: 6 })
         .build()
-      let round: Round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
+      let round: RoundState = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
       round = play(0, undefined, round)
       expect(round.currentColor).toEqual('RED')
     })
@@ -62,7 +62,7 @@ describe("Playing a card", () => {
         .hand(0)
           .is({type: 'SKIP', color: 'BLUE'})
         .build()
-      let round: Round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
+      let round: RoundState = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
       expect(round.playerInTurn).toEqual(0)
       round = play(0, undefined, round)
       expect(round.playerInTurn).toEqual(2)
@@ -112,7 +112,7 @@ describe("Playing a card", () => {
       .discard()
         .is({type: 'NUMBERED', color: 'BLUE', number: 6})
       .hand(0)
-        .is({type: 'DRAW', color: 'BLUE'})
+        .is({type: 'DRAW TWO', color: 'BLUE'})
     let round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler: builder.build()})
     beforeEach(() => {
       round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler: builder.build()})
@@ -143,14 +143,14 @@ describe("Playing a card", () => {
           .is({type: 'WILD'})
     })
     it("moves the action to the next hand", () => {
-      let round: Round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler: builder.build()})
+      let round: RoundState = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler: builder.build()})
       expect(round.playerInTurn).toEqual(0)
       round = play(0, 'RED', round)
       expect(round.playerInTurn).toEqual(1)
     })
     it("changes color to the chosen color", () => {
       builder.hand(1).is({color: 'RED'})
-      let round: Round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler: builder.build()})
+      let round: RoundState = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler: builder.build()})
       round = play(0, 'RED', round)
       expect(round.currentColor).toEqual('RED')
     })
@@ -163,24 +163,24 @@ describe("Playing a card", () => {
         .discard()
           .is({type: 'NUMBERED', color: 'BLUE', number: 6})
         .hand(0)
-          .is({type: 'WILD DRAW'})
+          .is({type: 'WILD DRAW FOUR'})
         .repeat(6).isnt({color: 'BLUE'})
     })
     it("skips the next player", () => {
-      let round: Round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler: builder.build()})
+      let round: RoundState = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler: builder.build()})
       expect(round.playerInTurn).toEqual(0)
       round = play(0, 'RED', round)
       expect(round.playerInTurn).toEqual(2)
     })
     it("gives the next player 4 cards", () => {
       const shuffler = builder.build()
-      let round: Round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
+      let round: RoundState = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
       round = play(0, 'RED', round)
       expect(round.hands[1].length).toEqual(11)
     })
     it("takes the 4 cards from the draw pile", () => {
       const shuffler = builder.build()
-      let round: Round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
+      let round: RoundState = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
       const pileSize = round.drawPile.length
       round = play(0, 'RED', round)
       expect(round.drawPile.length).toEqual(pileSize - 4)
@@ -188,7 +188,7 @@ describe("Playing a card", () => {
     it("changes color to the chosen color", () => {
       builder.hand(2).is({color: 'RED'})
       const shuffler = builder.build()
-      let round: Round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
+      let round: RoundState = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
       round = play(0, 'RED', round)
       expect(round.currentColor).toEqual('RED')
     })
@@ -207,7 +207,7 @@ describe("Playing a card", () => {
         .hand(0)
           .is({color: 'BLUE'})
         .build()
-      const round: Round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
+      const round: RoundState = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
       expect(() => play(0, "YELLOW", round)).toThrow()
     })
     it("is illegal _not_ to name a color on a wild card", () => {
@@ -217,7 +217,7 @@ describe("Playing a card", () => {
         .hand(0)
           .is({type: 'WILD'})
         .build()
-      const round: Round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
+      const round: RoundState = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
       expect(() => play(0, undefined, round)).toThrow()
     })
     it("is illegal _not_ to name a color on a wild draw card", () => {
@@ -225,10 +225,10 @@ describe("Playing a card", () => {
         .discard()
           .is({type: 'NUMBERED', color: 'BLUE'})
         .hand(0)
-          .is({type: 'WILD DRAW'})
+          .is({type: 'WILD DRAW FOUR'})
           .repeat(6).isnt({color: 'BLUE'})
         .build()
-      const round: Round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
+      const round: RoundState = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
       expect(() => play(0, undefined, round)).toThrow()
     })
   })
@@ -243,7 +243,7 @@ describe("Drawing a card", () => {
         .hand(0)
           .is({color: 'BLUE'})
         .build()
-      const round: Round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
+      const round: RoundState = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
       expect(canPlayAny(round)).toBeTruthy()
     })
     it("returns false if the player has a playable card", () => {
@@ -257,9 +257,9 @@ describe("Drawing a card", () => {
           .is({type: 'NUMBERED', color: 'GREEN', number: 4})
           .is({type: 'SKIP', color: 'RED'})
           .is({type: 'REVERSE', color: 'GREEN'})
-          .is({type: 'DRAW', color: 'YELLOW'})
+          .is({type: 'DRAW TWO', color: 'YELLOW'})
         .build()
-      const round: Round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
+      const round: RoundState = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
       expect(canPlayAny(round)).toBeFalsy()
     })
   })
@@ -277,7 +277,7 @@ describe("Drawing a card", () => {
         .is({type: 'NUMBERED', color: 'GREEN', number: 4})
         .is({type: 'SKIP', color: 'RED'})
         .is({type: 'REVERSE', color: 'GREEN'})
-        .is({type: 'DRAW', color: 'YELLOW'})    
+        .is({type: 'DRAW TWO', color: 'YELLOW'})    
     })
     it("adds the drawn card to the hand", () => {
       const shuffler = builder.build()
@@ -287,17 +287,17 @@ describe("Drawing a card", () => {
     })
     it("adds the top of the draw pile to the end of the hand", () => {
       const shuffler = builder
-        .drawPile().is({type: 'DRAW', color: 'GREEN'})
+        .drawPile().is({type: 'DRAW TWO', color: 'GREEN'})
         .build()
       let round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
       round = draw(round)
       expect(
-        is({type: 'DRAW', color: 'GREEN'})(round.hands[0][7])
+        is({type: 'DRAW TWO', color: 'GREEN'})(round.hands[0][7])
       ).toBeTruthy()
     })
     it("moves to the next player if the card is unplayable", () => {
       const shuffler = builder
-        .drawPile().is({type: 'DRAW', color: 'GREEN'})
+        .drawPile().is({type: 'DRAW TWO', color: 'GREEN'})
         .build()
       let round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
       round = draw(round)
@@ -305,7 +305,7 @@ describe("Drawing a card", () => {
     })
     it("doesn't move to the next player if the card is unplayable", () => {
       const shuffler = builder
-        .drawPile().is({type: 'DRAW', color: 'BLUE'})
+        .drawPile().is({type: 'DRAW TWO', color: 'BLUE'})
         .build()
       let round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler})
       round = draw(round)
@@ -329,8 +329,8 @@ describe("Drawing a card", () => {
           .is({type: 'NUMBERED', color: 'GREEN', number: 8})
         .hand(3)
           .is({type: 'NUMBERED', color: 'GREEN', number: 0}).build()
-      const cards = firstShuffler(createInitialDeck()).slice(0, 7)
-      let round: Round = undefined as any
+      const cards = firstShuffler(createInitialDeck().cards).slice(0, 7)
+      let round: RoundState = undefined as any
       beforeEach(() => {
         const shuffler = successiveShufflers(deterministicShuffler(cards), standardShuffler)
         round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler, cardsPerPlayer: 1})
@@ -398,13 +398,13 @@ describe("Drawing a card", () => {
         .is({type: 'NUMBERED', color: 'BLUE', number: 8})
       .drawPile()
         .is({type: 'NUMBERED', color: 'BLUE'})
-        .is({type: 'DRAW', color: 'BLUE'})
+        .is({type: 'DRAW TWO', color: 'BLUE'})
       .hand(0)
         .is({type: 'SKIP', color: 'GREEN'})
       .hand(1)
         .is({type: 'REVERSE', color: 'YELLOW'})
       .build()
-    const cards = shuffler1(createInitialDeck()).slice(0, 8)
+    const cards = shuffler1(createInitialDeck().cards).slice(0, 8)
     const shuffler = successiveShufflers(deterministicShuffler(cards), standardShuffler)
     let round = createRound({players: ['a', 'b', 'c', 'd'], dealer: 3, shuffler, cardsPerPlayer: 1})
     test("playing", () => {
@@ -412,7 +412,7 @@ describe("Drawing a card", () => {
       round = play(1, undefined, round)
       round = draw(round)
       expect(round.playerInTurn).toBe(1)
-      expect(round.hands[1][1].type).toEqual('DRAW')
+      expect(round.hands[1][1].type).toEqual('DRAW TWO')
       expect(round.drawPile.length).toEqual(1)
       round = play(1, undefined, round)
       expect(round.hands[2].length).toEqual(3)

@@ -19,10 +19,10 @@ export function createRound({
     dealer, 
     shuffler = standardShuffler,
     cardsPerPlayer = 7
-  }: RoundProps): round.Round {
-  return round.createRound(players, dealer, shuffler, cardsPerPlayer)
+  }: RoundProps): round.RoundState {
+  return round.createRound({players, dealer, shuffler, cardsPerPlayer})
 }
 
-export function createGame(props: Partial<uno.Props>): uno.Game {
+export function createGame(props: Partial<uno.GameConfig>): uno.Game {
   return uno.createGame(props)
 }

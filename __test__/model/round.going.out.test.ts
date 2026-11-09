@@ -1,12 +1,12 @@
 import { describe, it, test, expect } from '@jest/globals'
 import { createRound} from '../utils/test_adapter'
-import type { Round } from '../../src/model/round'
-import { canPlay, 
-         catchUnoFailure, 
+import type { RoundState } from '../../src/model/round'
+import { canPlay,
+         catchUnoFailure,
          sayUno,
-         checkUnoFailure, 
-         draw, 
-         play, 
+         checkUnoFailure,
+         draw,
+         play,
          hasEnded,
          winner,
          canPlayAny,
@@ -26,12 +26,12 @@ describe('catching failure to say "UNO!"', () => {
       .is({type: 'NUMBERED', color: 'RED', number: 5})
     .hand(0).is({type: 'NUMBERED', color: 'BLUE', number: 8}, {type: 'SKIP', color: 'BLUE'})
     .hand(1).is({type: 'NUMBERED', color: 'RED', number: 8}, {type: 'SKIP', color: 'GREEN'})
-    .hand(2).is({type: 'NUMBERED', color: 'GREEN', number: 8}, {type: 'DRAW', color: 'RED'})
+    .hand(2).is({type: 'NUMBERED', color: 'GREEN', number: 8}, {type: 'DRAW TWO', color: 'RED'})
     .hand(3).is({type: 'NUMBERED', color: 'RED', number: 4}, {type: 'REVERSE', color: 'RED'})
 
     describe("single UNO scenario", () => {
       const shuffler = builder.build()
-      const round: Round = _.flow([
+      const round: RoundState = _.flow([
         draw,
         _.partial(play, 2, undefined),
         draw,
@@ -113,7 +113,7 @@ describe('catching failure to say "UNO!"', () => {
       expect(checkUnoFailure({accuser: 2, accused: 0}, res)).toBeFalsy()
     })
     it("still succeeds if the player has said 'UNO!' before another players turn", () => {
-      const round: Round = _.flow([
+      const round: RoundState = _.flow([
         draw,
         _.partial(play, 2, undefined),
         draw,
@@ -129,8 +129,8 @@ describe('catching failure to say "UNO!"', () => {
   describe("emptying the draw pile", () => {
     builder.hand(3).is({type: 'NUMBERED', color: 'BLUE', number: 4}, {type: 'REVERSE', color: 'RED'})
     const shuffler = builder.build()
-    const cards = shuffler(createInitialDeck()).slice(0, 14)
-    const round: Round = _.flow([
+    const cards = shuffler(createInitialDeck().cards).slice(0, 14)
+    const round: RoundState = _.flow([
       draw,
       _.partial(play, 2, undefined),
       draw,
@@ -163,7 +163,7 @@ describe('catching failure to say "UNO!"', () => {
   describe("Multi UNO scenario", () => {
     builder.hand(3).is({type: 'NUMBERED', color: 'BLUE', number: 4}, {type: 'REVERSE', color: 'RED'})
     const shuffler = builder.build()
-    const cards = shuffler(createInitialDeck()).slice(0, 14)
+    const cards = shuffler(createInitialDeck().cards).slice(0, 14)
     const round = _.flow([
       draw,
       _.partial(play, 2, undefined),
@@ -300,7 +300,7 @@ describe("score", () => {
     }
   })
   it("has the value 20 if the opponent holds a draw card", () => {
-    builder.hand(1).is({type: 'DRAW'})
+    builder.hand(1).is({type: 'DRAW TWO'})
     const shuffler = builder.build()
     const round = play(0, undefined, createRound({players: ['a', 'b'], dealer: 1, shuffler, cardsPerPlayer: 1}))
     expect(score(round)).toEqual(20)
@@ -324,14 +324,14 @@ describe("score", () => {
     expect(score(round)).toEqual(50)
   })
   it("has the value 50 if the opponent holds a wild draw card", () => {
-    builder.hand(1).is({type: 'WILD DRAW'})
+    builder.hand(1).is({type: 'WILD DRAW FOUR'})
     const shuffler = builder.build()
     const round = play(0, undefined, createRound({players: ['a', 'b'], dealer: 1, shuffler, cardsPerPlayer: 1}))
     expect(score(round)).toEqual(50)
   })
   it("adds the cards if the opponent have more than one card", () => {
-    builder.hand(0).is({color: 'BLUE', type: 'DRAW'})
-    builder.hand(1).is({type: 'WILD DRAW'})
+    builder.hand(0).is({color: 'BLUE', type: 'DRAW TWO'})
+    builder.hand(1).is({type: 'WILD DRAW FOUR'})
     builder.drawPile().is({number: 5}, {type: 'REVERSE'})
     const shuffler = builder.build()
     const round = play(0, undefined, createRound({players: ['a', 'b'], dealer: 1, shuffler, cardsPerPlayer: 1}))
@@ -341,8 +341,8 @@ describe("score", () => {
   it("adds the cards of all opponents if there are more than 2 players", () => {
     const builder = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
       .discard().is({ type: 'NUMBERED', color: 'BLUE', number: 8 })
-      .hand(0).is({color: 'BLUE', type: 'DRAW'})
-      .hand(1).is({type: 'WILD DRAW'})
+      .hand(0).is({color: 'BLUE', type: 'DRAW TWO'})
+      .hand(1).is({type: 'WILD DRAW FOUR'})
       .hand(2).is({number: 7})
       .hand(3).is({number: 3})
       .drawPile().is({number: 5}, {type: 'REVERSE'})

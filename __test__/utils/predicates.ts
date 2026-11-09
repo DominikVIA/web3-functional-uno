@@ -20,7 +20,7 @@ export function is(spec: CardSpec): CardPredicate {
     switch(c.type) {
       case 'NUMBERED':
         return conforms(spec.type, 'NUMBERED') && conforms(spec.color, c.color) && conforms(spec.number, c.number)
-      case 'SKIP': case 'REVERSE': case 'DRAW':
+      case 'SKIP': case 'REVERSE': case 'DRAW TWO':
         return conforms(spec.type, c.type) && conforms(spec.color, c.color) && spec.number === undefined
       default:
         return conforms(spec.type, c.type) && spec.color === undefined && spec.number === undefined
