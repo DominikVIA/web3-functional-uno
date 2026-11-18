@@ -86,7 +86,7 @@ describe("Playing a round", () => {
       expect(game.scores).toEqual([0, 78, 0, 0])
     })
     test("a new round is started", () => {
-      expect(Round.hasEnded(game.currentRound!)).toBeFalsy
+      expect(Round.hasEnded(game.currentRound!)).toBeFalsy()
     })
   })
 })

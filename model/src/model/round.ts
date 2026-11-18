@@ -243,13 +243,15 @@ export const createRound = (
         throw Error('Invalid round')
     }
 
-    const {hands, deck: afterDeal} = players.reduce(
+    const {hands: dealt, deck: afterDeal} = players.reduce(
         (acc: { hands: Card[][], deck: Deck }) => {
             const {cards, deck} = dealMany(cardsPerPlayer, acc.deck)
             return {hands: [...acc.hands, [...cards]], deck}
         },
         {hands: [], deck: shuffle(shuffler, createInitialDeck())}
     )
+
+    const hands = players.map((_p, p) => dealt[mod(p - dealer - 1, players.length)])
 
     const {card: starter, deck: drawPile} = pickStarter(afterDeal, shuffler)
     const first = starterTurn(starter, dealer, players.length)

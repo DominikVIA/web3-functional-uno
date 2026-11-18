@@ -24,13 +24,12 @@ export type GameConfig = {
     cardsPerPlayer?: number
 }
 
-const startRound = (g: Pick<Game, 'players' | 'randomizer' | 'shuffler' | 'cardsPerPlayer'>): RoundState =>
-    createRound({
-        players: [...g.players],
-        dealer: g.randomizer(g.players.length),
-        shuffler: g.shuffler,
-        cardsPerPlayer: g.cardsPerPlayer
-    })
+const startRound = (
+    g: Pick<Game, 'players' | 'shuffler' | 'cardsPerPlayer'>,
+    dealer: number
+): RoundState =>
+    createRound({players: [...g.players], dealer, shuffler: g.shuffler, cardsPerPlayer: g.cardsPerPlayer})
+
 
 export const createGame = ({
                                players = ['A', 'B'],
@@ -51,7 +50,7 @@ export const createGame = ({
         randomizer,
         shuffler
     }
-    return {...base, currentRound: startRound(base)}
+    return {...base, currentRound: startRound(base, randomizer(players.length))}
 }
 
 const settle = (game: Game, round: RoundState): Game => {
@@ -63,7 +62,7 @@ const settle = (game: Game, round: RoundState): Game => {
 
     return scores[w] >= game.targetScore
         ? {...game, scores, winner: w, currentRound: undefined}
-        : {...game, scores, currentRound: startRound(game)}
+        : {...game, scores, currentRound: startRound(game, (round.dealer + 1) % game.playerCount)}
 }
 
 export const play = (f: (r: RoundState) => RoundState, game: Game): Game => {

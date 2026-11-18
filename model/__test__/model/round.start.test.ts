@@ -3,7 +3,6 @@ import { createRound, createInitialDeck} from '../utils/test_adapter'
 import { type RoundState, playerCount } from '../../src/model/round'
 import { shuffleBuilder } from '../utils/shuffling'
 import { deterministicShuffle, noShuffle, successiveShufflers } from '../utils/shuffling'
-import * as _ from 'lodash'
 
 const normalShuffle = shuffleBuilder()
 .discard()

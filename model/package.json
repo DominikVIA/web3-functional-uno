@@ -6,11 +6,11 @@
   "main": "main.tsx",
   "packageManager": "pnpm@12.3.4",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "test": "jest"
+    "dev": "../node_modules/.bin/vite",
+    "build": "../node_modules/.bin/tsc -b && vite build",
+    "lint": "../node_modules/.bin/eslint .",
+    "preview": "../node_modules/.bin/vite preview",
+    "test": "../node_modules/.bin/jest"
   },
   "dependencies": {
     "react": "^19.3.1",
