@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "uno-client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,8 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.14.0",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "react-dom": "^19.3.1",
+    "react-redux": "^9.3.1",
+    "react-router": "^8.5.1",
+    "rxjs": "^7.8.2",
+    "uno-model": "../model"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
