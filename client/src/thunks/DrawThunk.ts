@@ -1,4 +1,4 @@
-import { backend } from "../model/backend";
+import * as backend from '../model/api'
 import command from "./command";
 
 export default (game_id: string, player: string) =>

@@ -1,5 +1,5 @@
 import { map, retry } from 'rxjs'
-import { backend } from '../model/backend'
+import * as backend from '../model/api'
 import { pending_games_slice } from '../slices/pending_games_slice'
 import type { Thunk } from '../stores/store'
 

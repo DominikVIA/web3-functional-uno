@@ -1,4 +1,4 @@
-import fp from 'lodash/fp'
+import fp from 'lodash/fp.js'
 import type {Shuffler} from '../utils/random_utils'
 
 export const colors = ['BLUE', 'GREEN', 'RED', 'YELLOW'] as const

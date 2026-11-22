@@ -1,5 +1,5 @@
 import type {Game} from "../model/uno";
-import type {Card} from "../model/deck";
+import type {Card, Color} from "../model/deck";
 
 export type JoinEvent = {
     username: string;

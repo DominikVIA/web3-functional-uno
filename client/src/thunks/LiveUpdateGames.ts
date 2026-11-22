@@ -1,7 +1,7 @@
 import { filter, groupBy, map, merge, mergeMap, pairwise, retry, share } from 'rxjs'
 import type { Observable } from 'rxjs'
 import type { GameStateEvent } from 'uno-model/src/dto/events'
-import { backend } from '../model/backend'
+import * as backend from '../model/api'
 import { round_summary } from '../model/game'
 import { notifications_slice } from '../slices/notifications_slice'
 import { ongoing_games_slice } from '../slices/ongoing_games_slice'

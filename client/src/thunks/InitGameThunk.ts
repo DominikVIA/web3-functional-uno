@@ -1,4 +1,4 @@
-import { backend } from "../model/backend";
+import * as backend from '../model/api'
 import { ongoing_games_slice } from "../slices/ongoing_games_slice";
 import { pending_games_slice } from "../slices/pending_games_slice";
 import command from "./command";

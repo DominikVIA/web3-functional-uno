@@ -1,5 +1,5 @@
 import type { NavigateFunction } from "react-router"
-import { backend } from "../model/backend"
+import * as backend from '../model/api'
 import type { NewGameSettings } from "../model/game"
 import command from "./command"
 

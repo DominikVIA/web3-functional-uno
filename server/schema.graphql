@@ -1,0 +1,58 @@
+# The contract between the client (client/src/model/api.ts) and the server (server/src/schema.ts).
+# Names follow your Yahtzee schema (snake_case operations).
+
+type Card {
+  type: String!          # NUMBERED | SKIP | REVERSE | DRAW TWO | WILD | WILD DRAW FOUR
+  color: String          # BLUE | GREEN | RED | YELLOW, null for wild cards
+  number: Int            # 0-9, only for NUMBERED
+}
+
+# Exactly the GameStateEvent DTO. It is a PER-PLAYER projection (toGameStateEvent in the model
+# module): playerHand is the viewer's own hand, everyone else is only a count.
+type GameState {
+  gameId: ID!
+  playerPos: Int!
+  players: [String!]!
+  scores: [Int!]!
+  targetScore: Int!
+  handEnded: Boolean!    # true only on the snapshot in which a hand ended
+  playerInTurn: Int      # null when the game is over
+  currentColor: String   # BLUE | GREEN | RED | YELLOW (add `currentColor?: Color` to GameStateEvent)
+  discardPileTop: Card
+  playerHandCount: [Int!]
+  playerHand: [Card!]
+  unoState: [Boolean!]   # unoState[i]: player i forgot to say UNO and can still be caught
+}
+
+type PendingGame {
+  id: ID!
+  creator: String!
+  players: [String!]!
+  number_of_players: Int!
+  target_score: Int!
+  cards_per_player: Int!
+}
+
+type Query {
+  games(player: String!): [GameState!]!   # the games this player is in
+  pending_games: [PendingGame!]!
+}
+
+# Every call needs a login token; `player` arguments must be the logged-in player.
+# Commands answer only "accepted" or an error carrying the reason (for example "It is not
+# your turn"). New game state is delivered through the game_state subscription, never here.
+type Mutation {
+  new_game(creator: String!, number_of_players: Int!, target_score: Int!, cards_per_player: Int!): PendingGame!
+  join(id: ID!, player: String!): PendingGame!
+  play(id: ID!, player: String!, card_pos: Int!, color: String): Boolean!
+  draw(id: ID!, player: String!): Boolean!
+  say_uno(id: ID!, player: String!): Boolean!
+  catch_uno(id: ID!, player: String!, accused: Int!): Boolean!
+}
+
+type Subscription {
+  # a snapshot for every change of every game this player is in, projected for this player
+  game_state(player: String!): GameState!
+  # a lobby changed; a full lobby (players == number_of_players) is sent once more, then starts
+  pending: PendingGame!
+}

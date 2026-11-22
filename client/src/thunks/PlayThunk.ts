@@ -1,5 +1,5 @@
 import type { Color } from "uno-model/src/model/deck";
-import { backend } from "../model/backend";
+import * as backend from '../model/api'
 import command from "./command";
 
 // For a wild card pass the colour the player picked; for every other card leave it out.
