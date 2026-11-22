@@ -25,6 +25,7 @@ export type GameStateEvent = {
     playerInTurn?: number;
     discardPileTop?: Card;
     playerHandCount?: number[];
+    currentColor?: Color,
     playerHand?: Card[];
     scores: number[];
     unoState?: boolean[];

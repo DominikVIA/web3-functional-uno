@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs';
 import type { Observable } from 'rxjs';
-import type { GameAction } from 'model/src/dto/action';
+import type { GameAction } from 'uno-model/src/dto/action';
 import type { GameStateEvent } from 'uno-model/src/dto/events';
 import type { Color } from 'uno-model/src/model/deck';
 import { chooseBotActions } from 'uno-model/src/model/bot';
